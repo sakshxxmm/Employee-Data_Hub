@@ -50,18 +50,6 @@ const HomePage = () => {
     }
   };
 
-  const handleResetData = async () => {
-    if (window.confirm("Reset employee directory to default demo records?")) {
-      const res = await employeeService.resetDemoData();
-      if (res.success) {
-        setAllEmployees(res.data);
-        setSearchQuery("");
-        setSelectedDept("All");
-        showStatus("Directory successfully reset to default sample data.");
-      }
-    }
-  };
-
   const showStatus = (msg) => {
     setStatusMessage(msg);
     setTimeout(() => setStatusMessage(""), 3500);
@@ -100,23 +88,12 @@ const HomePage = () => {
         <div className="navbar-brand">
           <div className="navbar-brand-icon">👥</div>
           <span className="navbar-brand-text">StaffHub</span>
-          <span className="badge-storage" title="All operations run 100% offline via browser LocalStorage">
+          <span className="badge-storage" title="All operations run offline via browser LocalStorage">
             <span className="badge-storage-dot"></span>
             LocalStorage Mode
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <button
-            type="button"
-            className="btn-ghost"
-            onClick={handleResetData}
-            title="Reload default sample team members"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" width="14" height="14">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-            </svg>
-            Reset Demo Data
-          </button>
           <Link to="/addemployee" className="btn-primary">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -132,7 +109,7 @@ const HomePage = () => {
         <header className="page-header animate-fade-in-up">
           <div className="page-header-info">
             <h1>Team Directory</h1>
-            <p>High-performance client-side directory powered by LocalStorage persistence.</p>
+            <p>Manage your organization's team members with local storage persistence.</p>
           </div>
         </header>
 
@@ -170,60 +147,62 @@ const HomePage = () => {
             </div>
             <div className="stat-card">
               <div className="stat-card-value">{filteredEmployees.length}</div>
-              <div className="stat-card-label">Matching Directory View</div>
+              <div className="stat-card-label">Matching View</div>
             </div>
           </div>
         )}
 
         {/* Toolbar: Search & Filter */}
-        <div className="toolbar-row animate-fade-in-up">
-          <div className="toolbar-controls">
-            <div className="search-box">
-              <span className="search-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" width="16" height="16">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                </svg>
-              </span>
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search by name, role, title, or email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+        {allEmployees.length > 0 && (
+          <div className="toolbar-row animate-fade-in-up">
+            <div className="toolbar-controls">
+              <div className="search-box">
+                <span className="search-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" width="16" height="16">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  className="search-input"
+                  placeholder="Search by name, role, title, or email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+
+              <select
+                className="filter-select"
+                value={selectedDept}
+                onChange={(e) => setSelectedDept(e.target.value)}
+                aria-label="Filter by department"
+              >
+                {availableDepartments.map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept === "All" ? "All Departments" : dept}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <select
-              className="filter-select"
-              value={selectedDept}
-              onChange={(e) => setSelectedDept(e.target.value)}
-              aria-label="Filter by department"
-            >
-              {availableDepartments.map((dept) => (
-                <option key={dept} value={dept}>
-                  {dept === "All" ? "All Departments" : dept}
-                </option>
-              ))}
-            </select>
+            {(searchQuery || selectedDept !== "All") && (
+              <button
+                className="btn-ghost"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedDept("All");
+                }}
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
-
-          {(searchQuery || selectedDept !== "All") && (
-            <button
-              className="btn-ghost"
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedDept("All");
-              }}
-            >
-              Clear Filters
-            </button>
-          )}
-        </div>
+        )}
 
         {/* Table View */}
         {loading ? (
           <div className="table-wrapper">
-            {[...Array(5)].map((_, i) => (
+            {[...Array(3)].map((_, i) => (
               <div
                 key={i}
                 className="skeleton"
@@ -234,17 +213,12 @@ const HomePage = () => {
         ) : allEmployees.length === 0 ? (
           <div className="table-wrapper">
             <div className="empty-state">
-              <div className="empty-state-icon">🏢</div>
+              <div className="empty-state-icon">👥</div>
               <h3>No employees yet</h3>
-              <p>Get started by adding your first team member or resetting demo records.</p>
-              <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center" }}>
-                <button onClick={handleResetData} className="btn-secondary">
-                  Load Demo Data
-                </button>
-                <Link to="/addemployee" className="btn-primary">
-                  Add First Employee
-                </Link>
-              </div>
+              <p>Get started by adding your first team member.</p>
+              <Link to="/addemployee" className="btn-primary">
+                Add First Employee
+              </Link>
             </div>
           </div>
         ) : filteredEmployees.length === 0 ? (
@@ -280,22 +254,6 @@ const HomePage = () => {
                   <tr key={person._id}>
                     <td>
                       <div className="employee-cell">
-                        <img
-                          className="employee-avatar"
-                          src={
-                            person.image ||
-                            `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                              person.name
-                            )}&background=6366f1&color=fff`
-                          }
-                          alt={person.name}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                              person.name
-                            )}&background=6366f1&color=fff`;
-                          }}
-                        />
                         <div>
                           <div className="employee-name">{person.name}</div>
                           <div className="employee-email">{person.email}</div>
@@ -354,7 +312,7 @@ const HomePage = () => {
               <h3 className="modal-title">Delete Employee</h3>
             </div>
             <div className="modal-body">
-              Are you sure you want to remove <strong>{deletingPerson.name}</strong> from the directory? This record will be permanently deleted from local storage.
+              Are you sure you want to remove <strong>{deletingPerson.name}</strong> from the directory? This action will permanently remove this record from local storage.
             </div>
             <div className="modal-actions">
               <button className="btn-secondary" onClick={() => setDeletingPerson(null)}>

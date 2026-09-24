@@ -7,12 +7,11 @@ const CreateEmployeePage = () => {
     <section className="form-page">
       {/* Left hero panel */}
       <div className="form-page-hero">
-        <img
-          src="https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-          alt="Team at work"
-        />
         <div className="form-page-hero-content">
-          <h2>Build your dream team, one person at a time.</h2>
+          <h2>Build your team directory, one member at a time.</h2>
+          <p style={{ color: "var(--text-secondary)", marginTop: "0.75rem", fontSize: "0.95rem" }}>
+            Create and maintain records saved directly in your browser.
+          </p>
         </div>
       </div>
 

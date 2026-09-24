@@ -9,7 +9,6 @@ const FIELDS = [
   { name: "title",      label: "Job Title",       type: "text",  placeholder: "e.g. Senior Frontend Engineer", required: true },
   { name: "department", label: "Department",      type: "text",  placeholder: "e.g. Engineering, Design, Product", required: true },
   { name: "role",       label: "Role",            type: "text",  placeholder: "e.g. Admin, Lead, Member", required: true },
-  { name: "image",      label: "Avatar URL (Optional)", type: "url", placeholder: "https://... (leave empty for auto avatar)" },
 ];
 
 const EmployeeForm = () => {
