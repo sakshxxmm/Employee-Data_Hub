@@ -1,46 +1,52 @@
-const User = require("../models/User")
+const User = require("../models/User");
 
-exports.editUser = async (req,res) => {
-   try{
-    console.log("req.body=>",req.body)
-    const {userId} = req.body
-    console.log('req.body._id=>', userId)
-    const updates = req.body
-    const user = await User.findById(userId)
-    if(!user){
-     return res.status(404).json({
-         success:false,
-         message:"User Not Found"
-     })
-    }
-    //updates only the field that are present in the req body
-    for(const key in updates){
-        if(updates.hasOwnProperty(key)){
-        if(key==="name"){
-            user[key] = updates[key]
-            // console.log("userimage=>",user.image)
-            user.image=`https://api.dicebear.com/5.x/initials/svg?seed=${updates[key]}`
-            // console.log("userimageupdated=>",user.image)
-        }
-        // else if(key ==="image"){
-        //     continue
-        // }
-        else{ 
-            user[key] = updates[key]
-        }
-        }
-    }
-    await user.save()
+exports.editUser = async (req, res) => {
+  try {
+    const userId = req.body.userId || req.body._id || req.body.id;
+    console.log("Edit request received for userId:", userId);
 
-    res.json({
-        success:true,
-        message:"Course edited successfully",
-    })
-   }catch(error){
-    console.log("Error Occured while editing course=>",error)
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required for updating",
+      });
+    }
+
+    const updates = req.body;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User Not Found",
+      });
+    }
+
+    for (const key in updates) {
+      if (Object.prototype.hasOwnProperty.call(updates, key)) {
+        if (key === "_id" || key === "userId" || key === "id") continue;
+        if (key === "name") {
+          user.name = updates[key];
+          user.image = `https://api.dicebear.com/5.x/initials/svg?seed=${updates[key]}`;
+        } else {
+          user[key] = updates[key];
+        }
+      }
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Employee updated successfully",
+      data: user,
+    });
+  } catch (error) {
+    console.error("Error occurred while editing user:", error);
     return res.status(500).json({
-        success:false,
-        message:"Something went wrong while editing the course"
-    })
-   }
-}
+      success: false,
+      message: "Something went wrong while editing the user",
+      error: error.message,
+    });
+  }
+};
