@@ -38,7 +38,7 @@ exports.editUser = async (req,res) => {
     })
    }catch(error){
     console.log("Error Occured while editing course=>",error)
-    return res.status.json({
+    return res.status(500).json({
         success:false,
         message:"Something went wrong while editing the course"
     })
